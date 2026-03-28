@@ -10,7 +10,6 @@ export function registerTasksEventPipeline(
 	let previousPayload: TasksPluginCacheUpdatePayload | null = null;
 
 	const handler = (payload: TasksPluginCacheUpdatePayload) => {
-
 		const changes = diffTasks(previousPayload, payload);
 		void pipeline.dispatch(changes, {
 			plugin,

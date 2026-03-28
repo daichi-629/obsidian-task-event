@@ -38,6 +38,29 @@ pnpm run build
   - `vault/.obsidian/plugins/sample-monorepo-plugin/`
 - On first build/watch run, `hot-reload` is cloned and copied to:
   - `vault/.obsidian/plugins/hot-reload/`
+- Detailed rule specification: `docs/rules.md`
+
+## Rule trigger example
+
+Rules can use `fromStatus` / `toStatus` or the aliases `beforeStatus` / `afterStatus`.
+Each field accepts either a single status or a list of statuses.
+
+```json
+[
+  {
+    "id": "record-completion",
+    "name": "Record completion datetime",
+    "enabled": true,
+    "trigger": {
+      "beforeStatus": [" ", "/"],
+      "afterStatus": "x"
+    },
+    "actions": [
+      { "type": "set", "key": "completionDatetime", "value": "{{datetime}}" }
+    ]
+  }
+]
+```
 
 ## Lint
 
