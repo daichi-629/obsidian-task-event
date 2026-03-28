@@ -1,49 +1,32 @@
-# Obsidian Sample Monorepo Plugin
+# Task Event
 
-Two-package monorepo template based on the Obsidian sample plugin:
+Task Event is an Obsidian plugin that watches task status changes from the Tasks plugin and updates inline metadata with rules.
 
-- `packages/core`: Obsidian-independent logic.
-- `packages/plugin`: Obsidian plugin that depends on `core`.
+## What it does
 
-## Quick start
+- Detects task status changes from the Obsidian Tasks plugin
+- Matches rules by status transition, Dataview inline fields, and file path
+- Applies `set`, `append`, and `delete` actions to task-line metadata
 
-```bash
-pnpm install
-pnpm run dev --filter plugin
-```
+Example:
 
-When the plugin build starts, it also ensures the `hot-reload` plugin is installed into the local vault plugin directory from <https://github.com/pjeby/hot-reload>.
+- Complete a task
+- Add `[completionDatetime:: 2026-03-29T03:41]`
+- Reopen the task
+- Remove `[completionDatetime:: ...]`
 
-## Run Obsidian in Docker
+## Installation
 
-A local vault directory is included at `./vault` and mounted into the container at `/config/vault`.
+1. Build or download the plugin files.
+2. Copy `main.js`, `manifest.json`, and `styles.css` into:
+   `<Vault>/.obsidian/plugins/obsidian-task-event/`
+3. In Obsidian, open **Settings → Community plugins** and enable **Task Event**.
 
-```bash
-docker compose up -d
-```
+## Rule file
 
-This uses `linuxserver/obsidian` via `docker-compose.yml`.
+Set a Markdown file path in the plugin settings. The plugin reads the first `json` code block from that file.
 
-## Build
-
-```bash
-pnpm run build
-```
-
-## Notes
-
-- Plugin entry: `packages/plugin/src/main.ts`
-- Build output: `packages/plugin/main.js`
-- On build/watch, `main.js`, `manifest.json`, and `styles.css` are copied to:
-  - `vault/.obsidian/plugins/sample-monorepo-plugin/`
-- On first build/watch run, `hot-reload` is cloned and copied to:
-  - `vault/.obsidian/plugins/hot-reload/`
-- Detailed rule specification: `docs/rules.md`
-
-## Rule trigger example
-
-Rules can use `fromStatus` / `toStatus` or the aliases `beforeStatus` / `afterStatus`.
-Each field accepts either a single status or a list of statuses.
+Minimal example:
 
 ```json
 [
@@ -52,7 +35,6 @@ Each field accepts either a single status or a list of statuses.
     "name": "Record completion datetime",
     "enabled": true,
     "trigger": {
-      "beforeStatus": [" ", "/"],
       "afterStatus": "x"
     },
     "actions": [
@@ -62,24 +44,33 @@ Each field accepts either a single status or a list of statuses.
 ]
 ```
 
-## Lint
+Status conditions support both single values and arrays:
 
-```bash
-pnpm run lint
+```json
+{
+  "beforeStatus": [" ", "/"],
+  "afterStatus": "x"
+}
 ```
 
-## Test
+Detailed rule syntax is documented in [docs/rules.md](/home/daichi/ghq/github.com/daichi-629/obsidian-task-event/docs/rules.md).
+
+## Default behavior
+
+If no valid rule file is configured, the plugin uses built-in defaults:
+
+- When a task changes to `x`, set `completionDatetime`
+- When a task changes from `x` to another status, delete `completionDatetime`
+
+## Developer
 
 ```bash
-pnpm --filter @sample/core run test
+pnpm install
+pnpm run dev --filter plugin
+pnpm run build
+pnpm --filter plugin run lint
 ```
 
-Tests live under `packages/core/__tests__` and are configured by
-`packages/core/vitest.config.mts`.
-
-## Releasing
-
-- Update `packages/plugin/manifest.json` version and minimum app version.
-- Push a tag like `v1.2.3` to trigger the release workflow.
-- The release workflow uploads `packages/plugin/manifest.json`, `packages/plugin/main.js`,
-  and `packages/plugin/styles.css`.
+- Plugin entry: [packages/plugin/src/main.ts](/home/daichi/ghq/github.com/daichi-629/obsidian-task-event/packages/plugin/src/main.ts)
+- Manifest: [packages/plugin/manifest.json](/home/daichi/ghq/github.com/daichi-629/obsidian-task-event/packages/plugin/manifest.json)
+- Local test vault: `vault/`
