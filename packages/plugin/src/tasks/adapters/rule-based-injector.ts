@@ -1,6 +1,6 @@
 import type { Vault } from "obsidian";
 import type { TaskChange } from "../diff";
-import type { TaskChangeHandler, TaskChangeContext } from "../pipeline";
+import type { TaskChangeHandler } from "../pipeline";
 import type { PluginSettings } from "../../settings";
 import {
 	type MetadataInjectionRule,
@@ -85,7 +85,7 @@ async function processChange(
 	lines[lineIndex] = newLine;
 	await vault.modify(file, lines.join("\n"));
 
-	console.log("[rule-based-injector] Applied rules:", {
+	console.debug("[rule-based-injector] Applied rules:", {
 		path: change.path,
 		lineNumber: change.lineNumber,
 		matchedRules: matchingRules.map((r) => r.id),

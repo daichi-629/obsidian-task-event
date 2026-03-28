@@ -4,7 +4,7 @@ import type { RuleActionType } from "./types";
 const DATAVIEW_FIELD_PATTERN = /\[([^\]]+)::\s*([^\]]*)\]/g;
 
 /** Tasks プラグインのメタデータ絵文字 */
-const TASKS_EMOJI_PATTERN = /\s*[📅⏳🛫✅❌🔁⏫🔼🔽⏬🆔⛔]/;
+const TASKS_EMOJI_PATTERN = /\s*[📅⏳🛫✅❌🔁⏫🔼🔽⏬🆔⛔]/u;
 
 /**
  * タスク行のメタデータを変更する

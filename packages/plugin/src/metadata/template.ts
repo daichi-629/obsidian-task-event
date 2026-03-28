@@ -1,8 +1,10 @@
+import { moment } from "obsidian";
 import Mustache from "mustache";
 import type { TemplateContext } from "./types";
 
-// moment はObsidianが提供するグローバル変数
-declare const moment: typeof import("moment");
+type MomentFormatter = {
+	format(pattern: string): string;
+};
 
 /**
  * テンプレート文字列を展開する
@@ -25,7 +27,8 @@ export function buildTemplateContext(params: {
 	filePath: string;
 	existingFields: Record<string, string>;
 }): TemplateContext {
-	const now = moment();
+	const createMoment = moment as unknown as () => MomentFormatter;
+	const now = createMoment();
 
 	return {
 		date: now.format("YYYY-MM-DD"),

@@ -5,13 +5,13 @@ const DATAVIEW_FIELD_PATTERN = /\[([^\]]+)::\s*([^\]]*)\]/g;
 
 /** Tasks プラグインの絵文字メタデータパターン */
 const TASKS_EMOJI_PATTERNS: Record<keyof TasksEmojiMetadata, RegExp> = {
-	due: /📅\s*(\d{4}-\d{2}-\d{2})/,
-	scheduled: /⏳\s*(\d{4}-\d{2}-\d{2})/,
-	start: /🛫\s*(\d{4}-\d{2}-\d{2})/,
-	done: /✅\s*(\d{4}-\d{2}-\d{2})/,
-	cancelled: /❌\s*(\d{4}-\d{2}-\d{2})/,
-	recurrence: /🔁\s*([^\s📅⏳🛫✅❌⏫🔼🔽⏬🆔⛔\[]+)/,
-	priority: /([⏫🔼🔽⏬])/,
+	due: /📅\s*(\d{4}-\d{2}-\d{2})/u,
+	scheduled: /⏳\s*(\d{4}-\d{2}-\d{2})/u,
+	start: /🛫\s*(\d{4}-\d{2}-\d{2})/u,
+	done: /✅\s*(\d{4}-\d{2}-\d{2})/u,
+	cancelled: /❌\s*(\d{4}-\d{2}-\d{2})/u,
+	recurrence: /🔁\s*([^[\s📅⏳🛫✅❌⏫🔼🔽⏬🆔⛔]+)/u,
+	priority: /([⏫🔼🔽⏬])/u,
 };
 
 /**

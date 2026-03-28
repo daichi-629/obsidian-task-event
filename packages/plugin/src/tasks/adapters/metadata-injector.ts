@@ -1,6 +1,6 @@
-import type { Plugin, Vault } from "obsidian";
+import type { Vault } from "obsidian";
 import type { TaskChange } from "../diff";
-import type { TaskChangeHandler, TaskChangeContext } from "../pipeline";
+import type { TaskChangeHandler } from "../pipeline";
 
 /**
  * Dataview形式のメタデータをタスク行に差し込むためのハンドラーを作成
@@ -63,7 +63,7 @@ async function injectCompletedMetadata(vault: Vault, change: TaskChange): Promis
 	
 	await vault.modify(file, lines.join("\n"));
 	
-	console.log("[metadata-injector] Injected metadata:", {
+	console.debug("[metadata-injector] Injected metadata:", {
 		path: change.path,
 		lineNumber: change.lineNumber,
 		originalLine,
@@ -79,7 +79,7 @@ async function injectCompletedMetadata(vault: Vault, change: TaskChange): Promis
  */
 function insertBeforeTasksMetadata(line: string, metadata: string): string {
 	// Tasks プラグインのメタデータ絵文字
-	const emojiPattern = /\s*[📅⏳🛫✅❌🔁⏫🔼🔽⏬🆔⛔]/;
+	const emojiPattern = /\s*[📅⏳🛫✅❌🔁⏫🔼🔽⏬🆔⛔]/u;
 	// Dataview インラインフィールド
 	const dataviewPattern = /\s*\[[^\]]+::/;
 	
