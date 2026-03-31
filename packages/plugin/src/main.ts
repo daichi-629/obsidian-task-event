@@ -1,10 +1,5 @@
 import { normalizePath, Plugin, TFile } from "obsidian";
-import {
-	loadSettings,
-	refreshRules,
-	saveSettings,
-	type PluginSettings,
-} from "./settings";
+import { loadSettings, refreshRules, saveSettings, type PluginSettings } from "./settings";
 import { TaskEventSettingTab } from "./settings-tab";
 import { registerTasksPipeline } from "./tasks";
 
@@ -16,6 +11,9 @@ export default class TaskEventPlugin extends Plugin {
 		this.settings = await loadSettings(this);
 		this.addSettingTab(new TaskEventSettingTab(this.app, this));
 		this.registerRuleFileWatchers();
+		this.app.workspace.onLayoutReady(() => {
+			void refreshRules(this, this.settings);
+		});
 		registerTasksPipeline(this, () => this.settings);
 	}
 
@@ -23,7 +21,7 @@ export default class TaskEventPlugin extends Plugin {
 		this.registerEvent(
 			this.app.vault.on("modify", async (file) => {
 				await this.reloadRulesIfTarget(file);
-			}),
+			})
 		);
 		this.registerEvent(
 			this.app.vault.on("rename", async (file, oldPath) => {
@@ -32,12 +30,12 @@ export default class TaskEventPlugin extends Plugin {
 					await saveSettings(this, this.settings);
 				}
 				await this.reloadRulesIfTarget(file);
-			}),
+			})
 		);
 		this.registerEvent(
 			this.app.vault.on("delete", async (file) => {
 				await this.reloadRulesIfTarget(file);
-			}),
+			})
 		);
 	}
 

@@ -1,4 +1,4 @@
-import { normalizePath, TFile, type Vault } from "obsidian";
+import { normalizePath, Notice, TFile, type Vault } from "obsidian";
 import type { MetadataInjectionRule } from "./metadata";
 import { getDefaultRules } from "./rules";
 
@@ -9,7 +9,7 @@ export interface PluginSettings {
 
 const DEFAULT_SETTINGS: PluginSettings = {
 	rulesFilePath: "",
-	rules: getDefaultRules(),
+	rules: [],
 };
 
 const JSON_CODE_BLOCK_PATTERN = /```json\s*([\s\S]*?)```/gi;
@@ -62,7 +62,7 @@ export async function saveSettings(
 export function getDefaultSettings(): PluginSettings {
 	return {
 		rulesFilePath: DEFAULT_SETTINGS.rulesFilePath,
-		rules: getDefaultRules(),
+		rules: [],
 	};
 }
 
@@ -104,13 +104,14 @@ async function loadRulesFromMarkdown(
 	rulesFilePath: string,
 ): Promise<MetadataInjectionRule[]> {
 	if (!rulesFilePath.trim()) {
-		return getDefaultRules();
+		return [];
 	}
 
 	const file = findRulesFile(vault, rulesFilePath);
 	if (!file) {
 		console.warn("[settings] Rules file not found:", rulesFilePath);
-		return getDefaultRules();
+		notifySettingsLoadFailure(`Rules file not found: ${rulesFilePath}`);
+		return [];
 	}
 
 	try {
@@ -118,21 +119,28 @@ async function loadRulesFromMarkdown(
 		const jsonText = extractFirstJsonCodeBlock(content);
 		if (!jsonText) {
 			console.warn("[settings] No JSON code block found in rules file:", rulesFilePath);
-			return getDefaultRules();
+			notifySettingsLoadFailure(`Rules file has no JSON code block: ${rulesFilePath}`);
+			return [];
 		}
 
 		const parsed = JSON.parse(jsonText) as unknown;
 		const rules = normalizeRules(parsed);
 		if (!rules) {
 			console.warn("[settings] Invalid rules JSON in file:", rulesFilePath);
-			return getDefaultRules();
+			notifySettingsLoadFailure(`Rules file contains invalid JSON: ${rulesFilePath}`);
+			return [];
 		}
 
 		return rules;
 	} catch (error) {
 		console.error("[settings] Failed to load rules from markdown:", error);
-		return getDefaultRules();
+		notifySettingsLoadFailure(`Failed to load rules file: ${rulesFilePath}`);
+		return [];
 	}
+}
+
+function notifySettingsLoadFailure(message: string): void {
+	new Notice(message, 7000);
 }
 
 function extractFirstJsonCodeBlock(markdown: string): string | null {
